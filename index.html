@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Token Generator - EAT, JWT & Access Token</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <h1>TOKEN<br>GENERATOR</h1>
+            </div>
+            <button class="contact-btn">
+                ✉️ Contact Owner
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Free Fire Token Generator – EAT, JWT & Access Token</h2>
+            <p>The fastest Free Fire Token Generator online. Convert your <strong>EAT token to JWT</strong>, <strong>EAT to Access Token</strong>, or <strong>Access Token to JWT</strong> in seconds. Works for all Garena regions — ID, IND, SG, BR, TH and more.</p>
+            
+            <!-- Quick Action Buttons -->
+            <div class="quick-buttons">
+                <button class="quick-btn">FREE FIRE EAT TOKEN</button>
+                <button class="quick-btn">FF JWT TOKEN</button>
+                <button class="quick-btn">ACCESS TOKEN GENERATOR</button>
+                <button class="quick-btn">EAT TO JWT</button>
+                <button class="quick-btn">EAT TO ACCESS TOKEN</button>
+                <button class="quick-btn">FREE • SAFE • INSTANT</button>
+            </div>
+        </section>
+
+        <!-- How to Use Section -->
+        <section class="how-to-use">
+            <h3>🎮 HOW TO USE</h3>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <p>Select Provider & Login below.</p>
+                        <p class="safe-badge">✅ Safe: Official Garena Server</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <p>After login, copy the URL containing <code>eat=</code> parameter</p>
+                        <p class="example-label">Example URL:</p>
+                        <div class="code-block">
+                            https://discstore.kiosgamer.co.id/?eat=850c3ca593e30d3ad0a56a18f854a12e833667d97c4927597ee0c19dfab27c4ef1cd2bada46592fa0bc4e82b091da3473633ae1a67164890449f0ab06b8e1593dc9e7d9512d17a161ed2864fec1087&lang=en&ion=IND&account_id=298167005&nickname=%E3%85%A4%E3%85%A4%E3%85%A4%E3%85%A4%AP%0AA0024C
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <p>Select Conversion Action & Paste Token below.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Tutorial Section -->
+        <section class="video-tutorial">
+            <h3>📺 VIDEO TUTORIAL</h3>
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <div class="play-button">▶</div>
+                    <p>Click and Watch Tutorial</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Form Section -->
+        <section class="generator-form">
+            <!-- Select Provider -->
+            <div class="form-section">
+                <h4>SELECT PROVIDER & LOGIN</h4>
+                <div class="provider-buttons">
+                    <button class="provider-btn google">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google
+                    </button>
+                    <button class="provider-btn facebook">
+                        f
+                    </button>
+                    <button class="provider-btn apple">
+                        🍎
+                    </button>
+                    <button class="provider-btn twitter">
+                        𝕏
+                    </button>
+                    <button class="provider-btn vk">
+                        VK
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conversion Action -->
+            <div class="form-section">
+                <h4>⚡ CONVERSION ACTION</h4>
+                <select class="form-input" id="conversionAction">
+                    <option>EAT → Access Token</option>
+                    <option>EAT → JWT Token</option>
+                    <option>Access Token → JWT Token</option>
+                    <option>JWT Token → EAT</option>
+                </select>
+            </div>
+
+            <!-- Paste Token -->
+            <div class="form-section">
+                <h4>⚡ PASTE TOKEN</h4>
+                <div class="token-input-wrapper">
+                    <input 
+                        type="text" 
+                        class="form-input token-input" 
+                        id="tokenInput" 
+                        placeholder="https://discstore.kiosgamer.co..."
+                    >
+                    <button class="paste-btn">📋 Paste</button>
+                </div>
+                <p class="input-note">Both URL & Token Accepted</p>
+            </div>
+
+            <!-- Generate Button -->
+            <button class="generate-btn" id="generateBtn">
+                GENERATE TOKEN →
+            </button>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq">
+            <h3>❓ FREQUENTLY ASKED QUESTIONS</h3>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <h4>What is a Free Fire EAT Token?</h4>
+                    <p>EAT (External Auth Token) is an authentication token used by Free Fire/Garena to verify your account. It's used to perform account actions like changing your bio.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>What is a Free Fire JWT Token?</h4>
+                    <p>JWT (JSON Web Token) is a more secure token format derived from your EAT or Access Token. It's required by the Free Fire to authenticate requests.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Is this Free Fire Token Generator safe?</h4>
+                    <p>Yes, 100% safe. We use the official Garena OAuth login — your password is never shared with us. We only convert the token you already have.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>How to get my Free Fire EAT token?</h4>
+                    <p>Log in using the provider buttons above, then check your browser history for URLs containing 'eat='. and usually found in the redirected URL after login.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active">🏠 HOME</button>
+        <button class="nav-item">🔑 TOKEN</button>
+        <button class="nav-item">👤 BIO</button>
+        <button class="nav-item">⭐ UNIQUE</button>
+    </nav>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
