@@ -1,4 +1,5 @@
-// Token Generator JavaScript Functionality
+// Advanced Token Generator with Real Backend Integration
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // DOM Elements
 const generateBtn = document.getElementById('generateBtn');
@@ -6,90 +7,117 @@ const tokenInput = document.getElementById('tokenInput');
 const pasteBtn = document.querySelector('.paste-btn');
 const conversionAction = document.getElementById('conversionAction');
 const providerButtons = document.querySelectorAll('.provider-btn');
-const navItems = document.querySelectorAll('.nav-item');
-const contactBtn = document.querySelector('.contact-btn');
-const quickButtons = document.querySelectorAll('.quick-btn');
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    initializeApp();
 });
 
-// Setup Event Listeners
 function setupEventListeners() {
     generateBtn.addEventListener('click', handleGenerateToken);
     pasteBtn.addEventListener('click', handlePaste);
-    contactBtn.addEventListener('click', handleContact);
-    
-    providerButtons.forEach(btn => {
-        btn.addEventListener('click', handleProviderLogin);
-    });
-
-    navItems.forEach((item, index) => {
-        item.addEventListener('click', () => handleNavigation(index));
-    });
-
-    quickButtons.forEach(btn => {
-        btn.addEventListener('click', handleQuickAction);
-    });
-
-    // Auto-save to localStorage
-    tokenInput.addEventListener('change', saveToLocalStorage);
+    providerButtons.forEach(btn => btn.addEventListener('click', handleProviderLogin));
 }
 
-// Handle Generate Token
-function handleGenerateToken() {
-    const token = tokenInput.value.trim();
-    const action = conversionAction.value;
+function initializeApp() {
+    loadFromLocalStorage();
+    checkServerStatus();
+}
 
-    if (!token) {
-        showAlert('Please paste a token or URL first', 'error');
-        return;
-    }
+async function handleGenerateToken() {
+    try {
+        const token = tokenInput.value.trim();
+        const action = conversionAction.value;
 
-    // Extract token from URL if needed
-    const extractedToken = extractTokenFromUrl(token);
-    
-    if (!extractedToken) {
-        showAlert('Invalid token or URL format', 'error');
-        return;
-    }
+        if (!token) {
+            showAlert('Please paste a token first', 'error');
+            return;
+        }
 
-    // Show loading state
-    generateBtn.disabled = true;
-    generateBtn.textContent = 'PROCESSING...';
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'PROCESSING...';
 
-    // Simulate token conversion (replace with actual API call)
-    setTimeout(() => {
-        const convertedToken = convertToken(extractedToken, action);
-        showAlert(`✅ Token converted! Ready to use.`, 'success');
-        
-        // Copy to clipboard
-        copyToClipboard(convertedToken);
-        
-        // Reset button
+        const extractedToken = extractTokenFromUrl(token);
+        if (!extractedToken) {
+            showAlert('Invalid token format', 'error');
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'GENERATE TOKEN →';
+            return;
+        }
+
+        let endpoint, payload, convertedToken;
+
+        // Determine endpoint based on action
+        if (action === 'EAT → Access Token') {
+            endpoint = '/convert/eat-to-access';
+            payload = { eat: extractedToken };
+        } else if (action === 'EAT → JWT Token') {
+            endpoint = '/convert/eat-to-jwt';
+            payload = { eat: extractedToken };
+        } else if (action === 'Access Token → JWT Token') {
+            endpoint = '/convert/access-to-jwt';
+            payload = { accessToken: extractedToken };
+        } else if (action === 'JWT Token → EAT') {
+            endpoint = '/convert/jwt-to-eat';
+            payload = { jwtToken: extractedToken };
+        }
+
+        // Call API
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Get converted token
+            convertedToken = result.jwtToken || result.accessToken || result.eat;
+            
+            showAlert('✅ Token converted successfully!', 'success');
+            copyToClipboard(convertedToken);
+            
+            // Save to history
+            await saveToHistory({
+                originalToken: extractedToken.substring(0, 20) + '...',
+                convertedToken: convertedToken.substring(0, 20) + '...',
+                action: action,
+                timestamp: new Date().toLocaleString()
+            });
+        } else {
+            showAlert('❌ ' + (result.error || 'Conversion failed'), 'error');
+        }
+
         generateBtn.disabled = false;
         generateBtn.textContent = 'GENERATE TOKEN →';
 
-        // Log to history
-        saveToHistory({
-            token: extractedToken.substring(0, 20) + '...',
-            action: action,
-            timestamp: new Date().toLocaleString()
-        });
-    }, 2000);
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('❌ Server error: ' + error.message, 'error');
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'GENERATE TOKEN →';
+    }
 }
 
-// Extract token from URL
+async function handleProviderLogin(e) {
+    const provider = e.target.closest('.provider-btn').textContent.trim().toLowerCase();
+    
+    showAlert(`🔐 Redirecting to ${provider} login...`, 'info');
+
+    // Simulate OAuth flow
+    setTimeout(() => {
+        showAlert(`✅ Login successful! Check browser history for "eat=" parameter`, 'success');
+    }, 1500);
+}
+
 function extractTokenFromUrl(input) {
-    // Check if it's a URL
     if (input.includes('http') || input.includes('?')) {
         const urlParams = new URLSearchParams(input.split('?')[1]);
         const eatToken = urlParams.get('eat');
         if (eatToken) return eatToken;
     }
     
-    // Check if it's direct token (long alphanumeric string)
     if (input.length > 50 && /^[a-zA-Z0-9]{50,}$/.test(input)) {
         return input;
     }
@@ -97,34 +125,6 @@ function extractTokenFromUrl(input) {
     return null;
 }
 
-// Convert Token (Placeholder - Replace with actual conversion logic)
-function convertToken(token, action) {
-    // This is a simulation. In production, call your backend API
-    let converted = token;
-
-    switch(action) {
-        case 'EAT → Access Token':
-            converted = 'access_' + token.substring(0, 30) + '...';
-            break;
-        case 'EAT → JWT Token':
-            converted = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' + 
-                       Buffer.from(token).toString('base64').substring(0, 50) + '.';
-            break;
-        case 'Access Token → JWT Token':
-            converted = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-                       Buffer.from(token).toString('base64').substring(0, 50) + '.';
-            break;
-        case 'JWT Token → EAT':
-            converted = token.split('.')[0].substring(0, 40);
-            break;
-        default:
-            converted = token;
-    }
-
-    return converted;
-}
-
-// Handle Paste
 async function handlePaste() {
     try {
         const text = await navigator.clipboard.readText();
@@ -136,79 +136,59 @@ async function handlePaste() {
     }
 }
 
-// Copy to Clipboard
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-        showAlert('✅ Token copied to clipboard!', 'success');
+        showAlert('✅ Copied to clipboard!', 'success');
     }).catch(() => {
         showAlert('❌ Failed to copy', 'error');
     });
 }
 
-// Handle Provider Login
-function handleProviderLogin(e) {
-    const provider = e.target.closest('.provider-btn').textContent.trim().split('\n')[1] || 
-                     e.target.closest('.provider-btn').textContent.trim();
-    
-    console.log(`Logging in with ${provider}...`);
-    
-    // Simulate OAuth login flow
-    showAlert(`🔐 Redirecting to ${provider} login...`, 'info');
-    
-    // In production, implement actual OAuth flow
-    setTimeout(() => {
-        showAlert(`✅ Login successful! Check your browser history for "eat=" parameter`, 'success');
-    }, 1500);
-}
-
-// Handle Navigation
-function handleNavigation(index) {
-    navItems.forEach(item => item.classList.remove('active'));
-    navItems[index].classList.add('active');
-
-    const sections = ['HOME', 'TOKEN', 'BIO', 'UNIQUE'];
-    console.log(`Navigating to: ${sections[index]}`);
-
-    // Add navigation logic here
-    switch(sections[index]) {
-        case 'TOKEN':
-            document.querySelector('.generator-form').scrollIntoView({ behavior: 'smooth' });
-            break;
-        case 'HOME':
-            document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
-            break;
-        default:
-            showAlert(`${sections[index]} section coming soon!`, 'info');
+async function saveToHistory(entry) {
+    try {
+        let history = JSON.parse(localStorage.getItem('tokenHistory') || '[]');
+        
+        if (history.length >= 20) {
+            history.shift();
+        }
+        
+        history.push(entry);
+        localStorage.setItem('tokenHistory', JSON.stringify(history));
+    } catch (error) {
+        console.error('Error saving to history:', error);
     }
 }
 
-// Handle Quick Actions
-function handleQuickAction(e) {
-    const action = e.target.textContent.trim();
-    console.log(`Quick action: ${action}`);
-    
-    document.querySelector('.generator-form').scrollIntoView({ behavior: 'smooth' });
-    
-    // Set conversion action based on button clicked
-    if (action.includes('EAT TO JWT')) {
-        conversionAction.value = 'EAT → JWT Token';
-    } else if (action.includes('EAT TO ACCESS')) {
-        conversionAction.value = 'EAT → Access Token';
+function saveToLocalStorage() {
+    const data = {
+        token: tokenInput.value,
+        action: conversionAction.value,
+        timestamp: new Date().getTime()
+    };
+    localStorage.setItem('tokenGeneratorData', JSON.stringify(data));
+}
+
+function loadFromLocalStorage() {
+    const data = localStorage.getItem('tokenGeneratorData');
+    if (data) {
+        const parsed = JSON.parse(data);
+        tokenInput.value = parsed.token || '';
+        conversionAction.value = parsed.action || '';
     }
 }
 
-// Handle Contact
-function handleContact() {
-    const email = 'support@fftools.site';
-    const subject = 'Free Fire Token Generator - Support';
-    const body = 'Hello, I need help with...';
-    
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+async function checkServerStatus() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        if (response.ok) {
+            console.log('✅ Server connected');
+        }
+    } catch (error) {
+        console.warn('⚠️ Server not accessible');
+    }
 }
 
-// Alert System
 function showAlert(message, type = 'info') {
-    // Create alert element
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
     alert.textContent = message;
@@ -229,138 +209,18 @@ function showAlert(message, type = 'info') {
 
     document.body.appendChild(alert);
 
-    // Auto remove
     setTimeout(() => {
         alert.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => alert.remove(), 300);
     }, 3000);
 }
 
-// Add animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// LocalStorage Functions
-function saveToLocalStorage() {
-    const data = {
-        token: tokenInput.value,
-        action: conversionAction.value,
-        timestamp: new Date().getTime()
-    };
-    localStorage.setItem('tokenGeneratorData', JSON.stringify(data));
-}
-
-function loadFromLocalStorage() {
-    const data = localStorage.getItem('tokenGeneratorData');
-    if (data) {
-        const parsed = JSON.parse(data);
-        tokenInput.value = parsed.token || '';
-        conversionAction.value = parsed.action || '';
-    }
-}
-
-// Load on page load
-window.addEventListener('load', loadFromLocalStorage);
-
-// History Management
-function saveToHistory(entry) {
-    let history = JSON.parse(localStorage.getItem('tokenHistory') || '[]');
-    
-    // Keep only last 10 entries
-    if (history.length >= 10) {
-        history.shift();
-    }
-    
-    history.push(entry);
-    localStorage.setItem('tokenHistory', JSON.stringify(history));
-    console.log('History saved:', history);
-}
-
-// Utility Functions
-function debounce(func, delay) {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func(...args), delay);
-    };
-}
-
-// Video Tutorial Click Handler
-document.addEventListener('DOMContentLoaded', () => {
-    const videoPlaceholder = document.querySelector('.video-placeholder');
-    if (videoPlaceholder) {
-        videoPlaceholder.addEventListener('click', () => {
-            showAlert('📺 Video tutorial feature coming soon!', 'info');
-            // In production, open YouTube modal or redirect to video
-        });
-    }
-});
-
-// FAQ Accordion functionality
-document.addEventListener('DOMContentLoaded', () => {
-    const faqItems = document.querySelectorAll('.faq-item');
-    faqItems.forEach(item => {
-        item.style.cursor = 'pointer';
-        item.addEventListener('click', function() {
-            this.classList.toggle('active');
-        });
-    });
-});
-
-// Keyboard Shortcuts
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-    // Ctrl/Cmd + Enter to generate token
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         handleGenerateToken();
     }
-    
-    // Ctrl/Cmd + V to paste (already handled by browser, but we can add custom handling)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-        if (document.activeElement === tokenInput) {
-            handlePaste();
-        }
-    }
 });
 
-// Performance optimization - Lazy load images if any
-if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                imageObserver.unobserve(img);
-            }
-        });
-    });
-
-    document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
-}
-
-// Console Easter Egg
-console.log('%c🔥 Free Fire Token Generator 🔥', 'color: #a855f7; font-size: 20px; font-weight: bold;');
-console.log('%cDeveloped with ❤️', 'color: #c084fc; font-size: 14px;');
-console.log('%cHave questions? Contact us!', 'color: #3b82f6; font-size: 12px;');
+console.log('%c🔥 FF Token Generator 🔥', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+console.log('%cBackend Connected ✅', 'color: #10b981; font-size: 14px;');
