@@ -1,0 +1,40 @@
+{
+  "name": "free-fire-token-generator",
+  "version": "1.0.0",
+  "description": "The fastest Free Fire Token Generator online. Convert EAT, JWT & Access Tokens",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "npx live-server",
+    "build": "echo 'No build required for static site'",
+    "test": "echo 'Testing...' && exit 0"
+  },
+  "keywords": [
+    "free-fire",
+    "token",
+    "generator",
+    "eat-token",
+    "jwt-token",
+    "garena",
+    "converter"
+  ],
+  "author": "zevricplay",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zevricplay/eat_token.git"
+  },
+  "homepage": "https://www.fftools.site/free-fire-token-generator",
+  "bugs": {
+    "url": "https://github.com/zevricplay/eat_token/issues"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  },
+  "optionalDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
